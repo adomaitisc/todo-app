@@ -2,16 +2,6 @@ import type { NextPage } from "next";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
-  const { data, isLoading } = trpc.useQuery(["hello", { text: "Caua" }]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (data) {
-    return <div>{data.greeting}</div>;
-  }
-
   return (
     <div id="page" className="w-screen h-screen p-24 bg-zinc-200">
       <div
@@ -20,7 +10,7 @@ const Home: NextPage = () => {
       >
         <h1 className="text-zinc-800 text-3xl font-medium">Bem vindo Cauã,</h1>
         <div className="mt-8"></div>
-        <p className="text-zinc-800 text-2xl font-medium">suas tarefas:</p>
+        <p className="text-zinc-800 text-2xl font-medium">suas listas:</p>
         <div className="mt-4"></div>
         <div className="flex flex-row flex-wrap gap-4 items-start justify-start">
           {/* Where we will render the lists */}

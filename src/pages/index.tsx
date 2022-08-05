@@ -1,8 +1,17 @@
 import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
+import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
+  const { data, isLoading } = trpc.useQuery(["hello", { text: "Caua" }]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (data) {
+    return <div>{data.greeting}</div>;
+  }
+
   return (
     <div id="page" className="w-screen h-screen p-24 bg-zinc-200">
       <div

@@ -2,28 +2,30 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
 }
 
 model List {
-  id          String      @id @default(cuid())
-  createdAt   DateTime    @default(now())
+  listTitle       String
+  listDescription String?
+  listCompletion  Int
+  tasks           Task[]
 
-  title       String
-  description String
-  completion  Int
-  tasks       Task[]
+  id String @id @default(cuid())
 }
 
 model Task {
-  id          String      @id @default(cuid())
-  listId      String?
-  list        List?       @relation(fields: [listId], references: [id])
-  title       String
-  completed   Boolean
+  taskTitle   String
+  isCompleted Boolean
+
+  id     String  @id @default(cuid())
+  List   List?   @relation(fields: [listId], references: [id])
+  listId String?
 }

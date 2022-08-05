@@ -1,6 +1,12 @@
 import type { NextPage } from "next";
 import { trpc } from "../utils/trpc";
 
+// https://www.youtube.com/watch?v=PKy2lYEnhgs&t=3941s
+// https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases/introspection-typescript-postgres
+// https://trpc.io/docs/nextjs
+// https://app.planetscale.com/caadomaitis/list-of-tasks
+// https://www.prisma.io/docs/concepts/components/prisma-schema
+
 const Home: NextPage = () => {
   return (
     <div id="page" className="w-screen h-screen p-24 bg-zinc-200">

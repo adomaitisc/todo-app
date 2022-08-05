@@ -1,28 +1,26 @@
 import * as trpc from "@trpc/server";
 import { z } from "zod";
 
-export const appRouter = trpc.router().query("getListOfLists", {
-  // connect to db and get list of lists
-  resolve() {
-    // return list of lists
+import { prisma } from "../utils/prisma";
+
+export const appRouter = trpc.router().query("create-list-of-tasks", {
+  input: z.object({
+    listTitle: z.string(),
+    listDescription: z.string(),
+    listCompletion: z.number(),
+  }),
+  async resolve({ input }) {
+    const listInDb = await prisma.list.create({
+      data: {
+        ...input,
+      },
+    });
+
     return {
-      lists: ["list1", "list2", "list3"],
+      success: true,
     };
   },
 });
-
-// export const appRouter = trpc.router().query("hello", {
-//   input: z
-//     .object({
-//       text: z.string().nullish(),
-//     })
-//     .nullish(),
-//   resolve({ input }) {
-//     return {
-//       greeting: `hello ${input?.text ?? "world"}`,
-//     };
-//   },
-// });
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

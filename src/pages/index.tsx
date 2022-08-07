@@ -1,23 +1,42 @@
 import type { NextPage } from "next";
-import { useEffect, useState } from "react";
+import type { GetServerSideProps } from "next";
+import { Key, useEffect, useState } from "react";
 import { trpc } from "../utils/trpc";
+import { prisma } from "../server/utils/prisma";
 
 // pscale connect list-of-tasks main
 // npm run dev
 // npx prisma studio
 
-const Home: NextPage = () => {
+const Home: React.FC<{
+  lists: {
+    listTitle: string;
+    listDescription: string;
+    listCompletion: number;
+    id: string;
+  }[];
+}> = (props) => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [lists, setLists] = useState<any>();
+
+  useEffect(() => {
+    setLists(props.lists);
+  }, [lists]);
 
   return (
     <div id="page" className="w-screen h-screen p-24 bg-zinc-200">
-      <FormModal isOpen={isModalOpen} close={() => setModalOpen(false)} />
+      <FormModal
+        isOpen={isModalOpen}
+        close={() => setModalOpen(false)}
+        setLists={setLists}
+        lists={lists}
+      />
       <div
         id="content"
         className="w-full h-full p-12 bg-zinc-100 shadow-lg rounded-3xl flex flex-col items-start justify-start"
       >
         <div className="w-full flex flex-row justify-between">
-          <h1 className="text-zinc-800 text-3xl font-medium">-</h1>
+          <h1 className="text-zinc-800 text-3xl font-medium">:)</h1>
           <button
             onClick={() => setModalOpen(true)}
             className="py-2 px-4 text-blue-700 text-sm font-medium hover:text-gray-900"
@@ -30,15 +49,52 @@ const Home: NextPage = () => {
         <div className="mt-4"></div>
         <div className="flex flex-row flex-wrap gap-4 items-start justify-start">
           {/* Where we will render the lists */}
-          <div className="w-72 h-32 p-8 bg-zinc-100 shadow rounded-lg flex flex-col items-start justify-between duration-100 hover:scale-105">
-            <div className="w-full flex flex-row items-center justify-between">
-              <h1 className="text-lg text-zinc-800">-</h1>
-              <p className="text-xl text-zinc-700 font-bold">100%</p>
-            </div>
-            <div className="w-full h-1 rounded-full bg-blue-500"></div>
-          </div>
+          {lists?.map(
+            (
+              list: {
+                listTitle: string;
+                listDescription: string;
+                listCompletion: number;
+                id: string;
+              },
+              i: Key | null | undefined
+            ) => {
+              return <List list={list} key={i} />;
+            }
+          )}
         </div>
       </div>
+    </div>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const listsFromDb = await prisma.list.findMany();
+
+  return { props: { lists: listsFromDb } };
+};
+
+type ListProps = {
+  list: {
+    listTitle: string;
+    listDescription: string;
+    listCompletion: number;
+    id: string;
+  };
+};
+
+const List = ({ list }: ListProps) => {
+  return (
+    <div className="w-72 h-32 p-8 bg-zinc-100 shadow rounded-lg flex flex-col items-start justify-between duration-100 hover:scale-105">
+      <div className="w-full flex flex-row items-center justify-between">
+        <div className="flex flex-between">
+          <h1 className="text-lg text-zinc-800">{list.listTitle}</h1>
+        </div>
+        <p className="text-xl text-zinc-700 font-bold">
+          {list.listCompletion}%
+        </p>
+      </div>
+      <div className="w-full h-1 rounded-full bg-blue-500"></div>
     </div>
   );
 };
@@ -46,9 +102,11 @@ const Home: NextPage = () => {
 type FormModalProps = {
   isOpen: boolean;
   close: () => void;
+  setLists: any;
+  lists: any;
 };
 
-const FormModal = ({ isOpen, close }: FormModalProps) => {
+const FormModal = ({ isOpen, close, setLists, lists }: FormModalProps) => {
   const initialValues = { listTitle: "", listDescription: "" };
   const [formData, setFormData] = useState(initialValues);
 
@@ -61,13 +119,15 @@ const FormModal = ({ isOpen, close }: FormModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
     createListOfTasks.mutate({
       listTitle: formData.listTitle,
       listDescription: formData.listDescription,
       listCompletion: 0,
     });
     close();
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   const handleClose = (e: any) => {

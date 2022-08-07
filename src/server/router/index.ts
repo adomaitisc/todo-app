@@ -5,11 +5,39 @@ import { prisma } from "../utils/prisma";
 
 export const appRouter = trpc
   .router()
-  .query("get-list-by-id", {
+  .query("get-lists", {
     async resolve() {
       const lists = await prisma.list.findMany();
       return {
         lists,
+      };
+    },
+  })
+  .query("get-list-by-id", {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ input }) {
+      const listFromId = await prisma.list.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+      return listFromId;
+    },
+  })
+  .query("delete-list-by-id", {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ input }) {
+      const listFromId = await prisma.list.delete({
+        where: {
+          id: input.id,
+        },
+      });
+      return {
+        success: true,
       };
     },
   })
@@ -20,8 +48,7 @@ export const appRouter = trpc
       listCompletion: z.number(),
     }),
     async resolve({ input }) {
-      console.log(input);
-      const createList = await prisma.list.create({
+      await prisma.list.create({
         data: {
           ...input,
         },

@@ -41,7 +41,7 @@ export const appRouter = trpc
       };
     },
   })
-  .mutation("create-list-of-tasks", {
+  .mutation("create-list", {
     input: z.object({
       listTitle: z.string(),
       listDescription: z.string(),

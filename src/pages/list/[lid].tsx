@@ -31,8 +31,14 @@ const List = () => {
     },
   });
   const deleteTasks = trpc.useMutation(["delete-tasks-from-id"]);
+  const updateCompletion = trpc.useMutation(["set-list-completion-by-id"]);
 
-  //   const deleteTask = trpc.useMutation(["delete-task-by-id"]);
+  const handleGoBack = () => {
+    try {
+      updateCompletion.mutate({ id: lid!.toString() });
+    } catch {}
+    router.push("/");
+  };
 
   const handleListDelete = () => {
     try {
@@ -72,15 +78,16 @@ const List = () => {
   };
 
   return (
-    <div className="w-screen h-screen py-24 px-48 bg-gray-200">
+    <div className="w-screen h-screen md:py-24 md:px-48 sm:py-12 sm:px-24 bg-gray-200">
       {/* Actual content */}
       <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
         <div className="w-full flex flex-row justify-between">
-          <Link href="/">
-            <a className="py-2 px-4 text-gray-400 text-sm font-medium hover:text-gray-900">
-              Início
-            </a>
-          </Link>
+          <button
+            onClick={handleGoBack}
+            className="py-2 px-4 text-gray-400 text-sm font-medium hover:text-gray-900"
+          >
+            Início
+          </button>
 
           <button
             onClick={() => setModalOpen(true)}

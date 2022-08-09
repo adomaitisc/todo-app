@@ -153,26 +153,43 @@ export const appRouter = trpc
           });
         }
       });
-      // const tasksFromList = await prisma.task.findMany({
-      //   where: {
-      //     listId: input.listId,
-      //   },
-      // });
-      // const size = tasksFromList.length;
-      // const completed = tasksFromList.filter((obj) => {
-      //   if (obj.isCompleted) {
-      //     return obj;
-      //   }
-      // }).length;
-      // const completion = (completed / size) * 100;
-      // await prisma.list.update({
-      //   data: {
-      //     listCompletion: completion,
-      //   },
-      //   where: {
-      //     id: input.listId,
-      //   },
-      // });
+      return {
+        success: true,
+      };
+    },
+  })
+  .mutation("set-list-completion-by-id", {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ input }) {
+      const list = await prisma.list.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+      const tasks = await prisma.task.findMany({
+        where: {
+          listId: input.id,
+        },
+      });
+      const size = tasks.length;
+      const completed = tasks.filter((obj) => {
+        if (obj.isCompleted) {
+          return obj;
+        }
+      }).length;
+      if (size > 0) {
+        const completion = Math.ceil((completed / size) * 100);
+        await prisma.list.update({
+          data: {
+            listCompletion: completion,
+          },
+          where: {
+            id: input.id,
+          },
+        });
+      }
       return {
         success: true,
       };

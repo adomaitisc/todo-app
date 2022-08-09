@@ -61,7 +61,7 @@ const Home = () => {
       {/* Actual content */}
       <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
         <div className="w-full flex flex-row justify-between">
-          <h1 className="text-gray-800 text-3xl font-medium">Bom Dia!</h1>
+          <h1 className="text-gray-800 text-3xl font-medium">Bem Vindo!</h1>
 
           {/* Create new List */}
           <button
@@ -73,7 +73,8 @@ const Home = () => {
         </div>
         <div className="mt-2"></div>
         <p className="text-gray-400 font-light text-lg">
-          Segunda-feira, 8 de Agosto de 2022
+          Este é um app simples para organizar deveres e acompanhar seu
+          progresso.
         </p>
         <div className="mt-12"></div>
         <div className="flex flex-row flex-wrap overflow-y-auto gap-4 items-start justify-start">
@@ -81,7 +82,7 @@ const Home = () => {
           {listsQuery.data?.lists.map((item, i) => {
             return (
               <Link key={i} href={`list/${item.id}`}>
-                <a className="md:w-64 h-32 sm:w-52 min-w-[13rem] p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20">
+                <a className="md:w-64 h-32 sm:w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20">
                   <div className="w-full flex flex-row items-center justify-between">
                     <div className="flex flex-between">
                       <h1 className="text-lg text-gray-800">

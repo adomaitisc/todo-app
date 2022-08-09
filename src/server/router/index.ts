@@ -5,7 +5,7 @@ import { prisma } from "../utils/prisma";
 
 export const appRouter = trpc
   .router()
-  //List CR(Update not coded)D
+  // CREATE SINGLE LIST
   .mutation("create-list", {
     input: z.object({
       listTitle: z.string(),
@@ -23,6 +23,7 @@ export const appRouter = trpc
       };
     },
   })
+  // GET ALL LISTS
   .query("get-lists", {
     async resolve() {
       const lists = await prisma.list.findMany();
@@ -31,6 +32,7 @@ export const appRouter = trpc
       };
     },
   })
+  // GET SINGLE LIST
   .query("get-list-by-id", {
     input: z.object({
       id: z.string(),
@@ -44,6 +46,7 @@ export const appRouter = trpc
       return listFromId;
     },
   })
+  // DELETE SINGLE LIST
   .mutation("delete-list-by-id", {
     input: z.object({
       id: z.string(),
@@ -59,24 +62,27 @@ export const appRouter = trpc
       };
     },
   })
-  //Task CRUD
-  .mutation("create-task", {
-    input: z.object({
-      listId: z.string(),
-      taskTitle: z.string(),
-      isCompleted: z.boolean(),
-    }),
+  // CREATE MANY TASKS
+  .mutation("create-many-tasks", {
+    input: z
+      .object({
+        listId: z.string(),
+        id: z.string(),
+        taskTitle: z.string(),
+        isCompleted: z.boolean(),
+      })
+      .array(),
     async resolve({ input }) {
-      await prisma.task.create({
-        data: {
-          ...input,
-        },
+      const created = await prisma.task.createMany({
+        data: [...input],
+        skipDuplicates: true,
       });
       return {
-        success: true,
+        message: `${created} tasks were created under the listId ${input[0].listId}`,
       };
     },
   })
+  // GET MANY TASKS
   .query("get-tasks-from-id", {
     input: z.object({
       listId: z.string(),
@@ -92,25 +98,33 @@ export const appRouter = trpc
       };
     },
   })
-  .mutation("set-task-completion", {
-    input: z.object({
-      id: z.string(),
-      isCompleted: z.boolean(),
-    }),
+  // UPDATE MANY TASKS
+  .mutation("update-tasks", {
+    input: z
+      .object({
+        listId: z.string(),
+        id: z.string(),
+        taskTitle: z.string(),
+        isCompleted: z.boolean(),
+      })
+      .array(),
     async resolve({ input }) {
-      await prisma.task.update({
-        data: {
-          isCompleted: input.isCompleted,
-        },
-        where: {
-          id: input.id,
-        },
+      input.forEach(async (item, i) => {
+        await prisma.task.update({
+          where: {
+            id: item.id,
+          },
+          data: {
+            isCompleted: item.isCompleted,
+          },
+        });
       });
       return {
         success: true,
       };
     },
   })
+  // DELETE MANY TASKS
   .mutation("delete-tasks-from-id", {
     input: z.object({
       listId: z.string(),
@@ -126,6 +140,7 @@ export const appRouter = trpc
       };
     },
   })
+  // UPDATE MANY COMPLETION
   .mutation("set-lists-completion", {
     async resolve() {
       const lists = await prisma.list.findMany();
@@ -158,6 +173,7 @@ export const appRouter = trpc
       };
     },
   })
+  // UPDATE SINGLE COMPLETION
   .mutation("set-list-completion-by-id", {
     input: z.object({
       id: z.string(),

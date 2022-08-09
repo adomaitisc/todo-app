@@ -25,7 +25,7 @@ model Task {
   taskTitle   String
   isCompleted Boolean
 
-  id     String  @id @default(cuid())
+  id     String  @id
   List   List?   @relation(fields: [listId], references: [id])
   listId String?
 }

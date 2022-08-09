@@ -1,7 +1,8 @@
+import Loading from "@/components/Loading";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const List = () => {
   const router = useRouter();
@@ -9,37 +10,61 @@ const List = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [formTaskTitle, setFormTaskTitle] = useState("");
-  //   trpc List
+  const [stateTasks, setStateTasks] = useState<any>([]);
+
+  const utils = trpc.useContext();
+
   const queryList = trpc.useQuery(["get-list-by-id", { id: lid!.toString() }]);
-  const deleteList = trpc.useMutation(["delete-list-by-id"]);
   const currentList = queryList.data!;
 
-  //   trpc Task
-  const utils = trpc.useContext();
   const queryTasks = trpc.useQuery([
     "get-tasks-from-id",
     { listId: lid!.toString() },
   ]);
-  const createTask = trpc.useMutation(["create-task"], {
+
+  const updateCompletion = trpc.useMutation(["set-list-completion-by-id"]);
+
+  const createTasks = trpc.useMutation(["create-many-tasks"], {
     async onSuccess() {
       await utils.invalidateQueries(["get-tasks-from-id"]);
     },
   });
-  const setTaskCompletion = trpc.useMutation(["set-task-completion"], {
+
+  const updateTasks = trpc.useMutation(["update-tasks"]);
+
+  const deleteList = trpc.useMutation(["delete-list-by-id"], {
     async onSuccess() {
       await utils.invalidateQueries(["get-tasks-from-id"]);
     },
   });
   const deleteTasks = trpc.useMutation(["delete-tasks-from-id"]);
-  const updateCompletion = trpc.useMutation(["set-list-completion-by-id"]);
 
+  // POPULATE STATE WITH QUERY
+  useEffect(() => {
+    if (queryTasks.data?.tasks) setStateTasks(queryTasks.data!.tasks);
+  }, []);
+
+  // INTERVAL FUNCTION TO SAVE TO BD
+  // useEffect(() => {
+  //   const savingFunction = setInterval(() => {
+  //     createTasks.mutate(stateTasks);
+  //   }, 300000);
+  //   return () => {
+  //     clearInterval(savingFunction);
+  //   };
+  // }, []);
+
+  // UPDATE LIST COMPLETION AND CREATE UNSAVED TASKS
   const handleGoBack = () => {
     try {
       updateCompletion.mutate({ id: lid!.toString() });
+      createTasks.mutate(stateTasks);
+      updateTasks.mutate(stateTasks);
     } catch {}
     router.push("/");
   };
 
+  // DELETE LIST AND ALL ITS TASKS
   const handleListDelete = () => {
     try {
       deleteList.mutate({ id: lid!.toString() });
@@ -48,66 +73,49 @@ const List = () => {
     router.push("/");
   };
 
-  const handleFormSubmit = async (e: any) => {
-    e.preventDefault();
+  // ADD TASK TO STATE
+  const handleNewTask = async (e: any) => {
+    if (!formTaskTitle) return;
     const input = {
       listId: lid!.toString(),
+      id: stateTasks.length.toString(),
       taskTitle: formTaskTitle,
       isCompleted: false,
     };
-    try {
-      await createTask.mutateAsync(input);
-      setFormTaskTitle("");
-    } catch {}
+    console.log(input);
+    setStateTasks([...stateTasks, input]);
+    setFormTaskTitle("");
+  };
+
+  const handleSave = async (e: any) => {
+    createTasks.mutate(stateTasks);
   };
 
   const handleFormChange = (e: any) => {
     const value = e.target.value;
-    console.log(value);
     setFormTaskTitle(value);
   };
 
   const handleCheckbox = async (e: any) => {
-    const input = {
-      id: e.target.name,
-      isCompleted: e.target.checked,
-    };
-    try {
-      await setTaskCompletion.mutateAsync(input);
-    } catch {}
+    const id = e.target.name;
+    const checked = e.target.checked;
+    // SHALLOW COPY OF TASKS
+    const tasks = [...stateTasks];
+    // SHALLOW COPY OF TASK ITEM
+    const task = { ...tasks[id] };
+    // UPDATING ISCOMPLETED PROPERTY
+    task.isCompleted = checked;
+    // INSERTING BACK INTO ARRAY
+    tasks[id] = task;
+    // SETTING STATE WITH NEW COPY
+    setStateTasks(tasks);
   };
 
   if (!queryList.data || !queryTasks) {
-    return (
-      <div className="w-screen h-screen md:py-24 md:px-48 sm:py-12 smpx-24 bg-gray-200">
-        <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
-          <div className="w-full flex flex-row justify-between">
-            <div className="w-24 h-2 rounded-full bg-gray-300"></div>
-            <div className="w-24 h-2 rounded-full bg-gray-300"></div>
-          </div>
-          <div className="mt-12"></div>
-          <div className="w-48 h-4 rounded-full bg-gray-300"></div>
-          <div className="mt-8"></div>
-          <div className="w-96 h-2 rounded-full bg-gray-300 "></div>
-          <div className="mt-4"></div>
-          <div className="w-36 h-2 rounded-full bg-gray-300 "></div>
-
-          <div className="mt-12"></div>
-
-          <div className="flex flex-col sm:w-full w-full gap-6 items-start justify-start">
-            <div className="md:w-24 h-1.5 sm:w-full w-full bg-gray-300 rounded-full"></div>
-            <div className="md:w-36 h-1.5 sm:w-full w-full bg-gray-300 rounded-full"></div>
-            <div className="md:w-12 h-1.5 sm:w-full w-full bg-gray-300 rounded-full"></div>
-            <div className="md:w-48 h-1.5 sm:w-full w-full bg-gray-300 rounded-full"></div>
-            <div className="md:w-24 h-1.5 sm:w-full w-full bg-gray-300 rounded-full"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <Loading page="list" />;
   }
-
   return (
-    <div className="w-screen h-screen md:py-24 md:px-48 sm:py-12 sm:px-24 bg-gray-200">
+    <div className="w-screen h-screen bg-gray-200">
       {/* Actual content */}
       <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
         <div className="w-full flex flex-row justify-between">
@@ -135,12 +143,9 @@ const List = () => {
         </p>
         <div className="mt-8"></div>
         {/* Create Task */}
-        <form
-          onSubmit={handleFormSubmit}
-          className="flex flex-row items-center gap-4 justify-center"
-        >
+        <div className="flex flex-row flex-wrap items-center gap-4 justify-start">
           <input
-            className="bg-gray-100 border border-gray-200 text-gray-900 placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className="bg-gray-100 border border-gray-200 text-gray-900 placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
             type="text"
             name="taskTitle"
             placeholder="ex: reformular ui"
@@ -148,32 +153,49 @@ const List = () => {
             required
             value={formTaskTitle}
           />
-          <button className="pr-4 text-blue-700 text-base font-medium hover:text-gray-900 whitespace-nowrap">
+          <button
+            onClick={handleNewTask}
+            className="pr-4 text-blue-700 text-sm font-medium hover:text-gray-900 whitespace-nowrap"
+          >
             Adicionar
           </button>
-        </form>
+          {/* {stateTasks.length > 0 && (
+            <button
+              onClick={handleSave}
+              className=" text-gray-400 text-sm hover:text-gray-900"
+            >
+              Salvar Alterações
+            </button>
+          )} */}
+        </div>
+
         <div className="mt-2 mb-4 border-t border-gray-200 w-full"></div>
         {/* Render Tasks */}
         <div className="flex flex-col w-full overflow-y-auto gap-4 items-start justify-start">
-          {queryTasks.data?.tasks.map((item, i) => {
-            return (
-              <div
-                key={i}
-                className="flex flex-row gap-2 items-center justify-center"
-              >
-                <input
-                  type="checkbox"
-                  name={item.id}
-                  checked={item.isCompleted ? true : false}
-                  onClick={(e) => handleCheckbox(e)}
-                  className="bg-gray-100 border-gray-200 hover:bg-blue-300/30 cursor-pointer w-6 h-6 border checked:bg-blue-500 checked:hover:bg-blue-400 focus:outline-none rounded-md"
-                />
-                <p className="text-gray-600 font-light text-sm">
-                  {item.taskTitle}
-                </p>
-              </div>
-            );
-          })}
+          {stateTasks.map(
+            (
+              item: { id: string; isCompleted: boolean; taskTitle: string },
+              i: number
+            ) => {
+              return (
+                <div
+                  key={i}
+                  className="flex flex-row gap-2 items-center justify-center"
+                >
+                  <input
+                    type="checkbox"
+                    name={item.id}
+                    checked={item.isCompleted ? true : false}
+                    onChange={(e) => handleCheckbox(e)}
+                    className="bg-gray-100 border-gray-200 hover:bg-blue-300/30 cursor-pointer w-6 h-6 border checked:bg-blue-500 checked:hover:bg-blue-400 focus:outline-none rounded-md"
+                  />
+                  <p className="text-gray-600 font-light text-sm">
+                    {item.taskTitle}
+                  </p>
+                </div>
+              );
+            }
+          )}
         </div>
       </div>
       {/* Delete modal */}

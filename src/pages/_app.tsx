@@ -15,6 +15,7 @@ export default withTRPC<AppRouter>({
      * @link https://trpc.io/docs/ssr
      */
     const url = "https://lists-of-tasks.vercel.app/api/trpc";
+    // const url = "http://localhost:3000/api/trpc";
 
     return {
       url,

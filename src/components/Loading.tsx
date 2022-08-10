@@ -5,13 +5,14 @@ type LoadingProps = {
 const Loading = ({ page }: LoadingProps) => {
   if (page === "home") {
     return (
-      <div className="w-screen h-screen md:py-24 md:px-48 sm:py-12 sm:px-24 bg-gray-200">
+      <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
         <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
-          <div className="w-full flex flex-row justify-between">
-            <div className="w-48 h-4 rounded-full bg-gray-300"></div>
-            <div className="w-12 h-2 rounded-full bg-gray-300"></div>
+          <div className="w-full flex flex-col justify-between">
+            <div className="w-12 self-end h-2 rounded-full bg-gray-300"></div>
           </div>
-          <div className="mt-12"></div>
+          <div className="mt-16"></div>
+          <div className="w-48 h-6 rounded-full bg-gray-300"></div>
+          <div className="mt-8"></div>
           <div className="w-96 h-2 rounded-full bg-gray-300 "></div>
           <div className="mt-4"></div>
           <div className="w-36 h-2 rounded-full bg-gray-300 "></div>
@@ -26,8 +27,8 @@ const Loading = ({ page }: LoadingProps) => {
     );
   }
   return (
-    <div className="w-screen h-screen md:py-24 md:px-48 sm:py-12 sm:px-24 bg-gray-200">
-      <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
+    <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
+      <div className="w-full h-full p-12 bg-gray-100 shadow-lg md:rounded-3xl flex flex-col items-start justify-start">
         <div className="w-full flex flex-row justify-between">
           <div className="w-12 h-2 rounded-full bg-gray-300"></div>
           <div className="w-12 h-2 rounded-full bg-gray-300"></div>
@@ -35,7 +36,7 @@ const Loading = ({ page }: LoadingProps) => {
         <div className="mt-16"></div>
         <div className="w-48 h-6 rounded-full bg-gray-300"></div>
         <div className="mt-8"></div>
-        <div className="w-full h-2 rounded-full bg-gray-300 "></div>
+        <div className="md:w-96 w-full h-2 rounded-full bg-gray-300 "></div>
         <div className="mt-4"></div>
         <div className="w-36 h-2 rounded-full bg-gray-300 "></div>
         <div className="mt-8"></div>

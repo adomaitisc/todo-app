@@ -36,6 +36,7 @@ const Home = () => {
 
   useEffect(() => {
     setCompletion.mutate();
+    utils.invalidateQueries(["get-lists"]);
   }, []);
 
   const handleFormSubmit = async (e: any) => {
@@ -62,22 +63,22 @@ const Home = () => {
   }
 
   return (
-    <div className="w-screen h-screen md:py-24 md:px-48 sm:py-12 sm:px-24 bg-gray-200">
+    <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
       {/* Actual content */}
       <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
-        <div className="w-full flex flex-row justify-between">
-          <h1 className="text-gray-800 text-3xl font-medium">Bem Vindo!</h1>
-
+        <div className="w-full flex flex-col justify-between">
           {/* Create new List */}
           <button
             onClick={() => setModalOpen(true)}
-            className="py-2 px-4 text-blue-700 text-sm font-medium hover:text-gray-900"
+            className="py-2 px-4 self-end text-blue-700 text-sm font-medium hover:text-gray-900"
           >
             Nova Lista
           </button>
         </div>
-        <div className="mt-2"></div>
-        <p className="text-gray-400 font-light text-lg">
+        <div className="mt-8"></div>
+        <h1 className="text-gray-800 text-5xl font-medium">Bem Vindo!</h1>
+        <div className="mt-4"></div>
+        <p className="text-gray-400 font-light text-xl">
           Este é um app simples para organizar deveres e acompanhar seu
           progresso.
         </p>

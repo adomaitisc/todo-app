@@ -3,6 +3,7 @@ import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { util } from "zod/lib/helpers/util";
 
 const List = () => {
   const router = useRouter();
@@ -41,18 +42,28 @@ const List = () => {
 
   // POPULATE STATE WITH QUERY
   useEffect(() => {
-    if (queryTasks.data?.tasks) setStateTasks(queryTasks.data!.tasks);
+    if (queryTasks.data?.tasks) {
+      const sortedData = queryTasks.data.tasks.sort(
+        (a, b) => parseInt(a.id) - parseInt(b.id)
+      );
+      setStateTasks(sortedData);
+    }
+  }, []);
+
+  useEffect(() => {
+    utils.invalidateQueries(["get-tasks-from-id"]);
   }, []);
 
   // INTERVAL FUNCTION TO SAVE TO BD
-  // useEffect(() => {
-  //   const savingFunction = setInterval(() => {
-  //     createTasks.mutate(stateTasks);
-  //   }, 300000);
-  //   return () => {
-  //     clearInterval(savingFunction);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const savingFunction = setInterval(() => {
+      createTasks.mutate(stateTasks);
+      router.reload();
+    }, 300000);
+    return () => {
+      clearInterval(savingFunction);
+    };
+  }, []);
 
   // UPDATE LIST COMPLETION AND CREATE UNSAVED TASKS
   const handleGoBack = () => {
@@ -115,9 +126,9 @@ const List = () => {
     return <Loading page="list" />;
   }
   return (
-    <div className="w-screen h-screen bg-gray-200">
+    <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
       {/* Actual content */}
-      <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
+      <div className="w-full h-full p-12 bg-gray-100 shadow-lg md:rounded-3xl sm:rounded-none flex flex-col items-start justify-start">
         <div className="w-full flex flex-row justify-between">
           <button
             onClick={handleGoBack}
@@ -130,7 +141,7 @@ const List = () => {
             onClick={() => setModalOpen(true)}
             className="py-2 px-4 text-red-700 text-sm font-medium hover:text-gray-900"
           >
-            Deletar
+            Deletar Lista
           </button>
         </div>
         <div className="mt-8"></div>
@@ -159,19 +170,11 @@ const List = () => {
           >
             Adicionar
           </button>
-          {/* {stateTasks.length > 0 && (
-            <button
-              onClick={handleSave}
-              className=" text-gray-400 text-sm hover:text-gray-900"
-            >
-              Salvar Alterações
-            </button>
-          )} */}
         </div>
 
         <div className="mt-2 mb-4 border-t border-gray-200 w-full"></div>
         {/* Render Tasks */}
-        <div className="flex flex-col w-full overflow-y-auto gap-4 items-start justify-start">
+        <div className="flex flex-col flex-wrap w-full overflow-y-auto gap-4 items-start justify-start">
           {stateTasks.map(
             (
               item: { id: string; isCompleted: boolean; taskTitle: string },

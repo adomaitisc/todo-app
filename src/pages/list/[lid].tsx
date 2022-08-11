@@ -1,9 +1,7 @@
 import Loading from "@/components/Loading";
 import { trpc } from "@/utils/trpc";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { util } from "zod/lib/helpers/util";
 
 const List = () => {
   const router = useRouter();
@@ -42,6 +40,9 @@ const List = () => {
 
   // POPULATE STATE WITH QUERY
   useEffect(() => {
+    while (!queryTasks.data) {
+      console.log("waiting data");
+    }
     if (queryTasks.data?.tasks) {
       const sortedData = queryTasks.data.tasks.sort(
         (a, b) => parseInt(a.id) - parseInt(b.id)
@@ -234,5 +235,4 @@ const List = () => {
     </div>
   );
 };
-
 export default List;

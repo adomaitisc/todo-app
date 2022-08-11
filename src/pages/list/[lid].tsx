@@ -55,27 +55,27 @@ const List = (props: any) => {
   }, []);
 
   // UPDATE LIST COMPLETION AND CREATE UNSAVED TASKS
-  const handleGoBack = async () => {
+  const handleGoBack = () => {
     try {
-      await updateCompletion.mutateAsync({ id: currentList.id });
-      await updateTasks.mutateAsync(stateTasks);
+      updateCompletion.mutateAsync({ id: currentList.id });
+      updateTasks.mutateAsync(stateTasks);
     } finally {
       router.push("/");
     }
   };
 
   // DELETE LIST AND ALL ITS TASKS
-  const handleListDelete = async () => {
+  const handleListDelete = () => {
     try {
-      await deleteList.mutateAsync({ id: currentList.id });
-      await deleteTasks.mutateAsync({ listId: currentList.id });
+      deleteList.mutate({ id: currentList.id });
+      deleteTasks.mutate({ listId: currentList.id });
     } finally {
       router.push("/");
     }
   };
 
   // ADD TASK TO STATE
-  const handleNewTask = async (e: any) => {
+  const handleNewTask = (e: any) => {
     if (!formTaskTitle) return;
     const input = {
       listId: currentList.id,
@@ -93,7 +93,7 @@ const List = (props: any) => {
     setFormTaskTitle(value);
   };
 
-  const handleCheckbox = async (e: any) => {
+  const handleCheckbox = (e: any) => {
     const id = e.target.name;
     const checked = e.target.checked;
     // SHALLOW COPY OF TASKS
@@ -108,9 +108,9 @@ const List = (props: any) => {
     setStateTasks(tasks);
   };
 
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = () => {
     try {
-      await createTasks.mutateAsync(stateTasks);
+      createTasks.mutate(stateTasks);
     } catch {}
   };
 

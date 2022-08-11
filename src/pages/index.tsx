@@ -21,7 +21,7 @@ const Home = (props: any) => {
     setStateLists(props.lists);
   }, []);
 
-  const handleFormSubmit = async (e: any) => {
+  const handleFormSubmit = (e: any) => {
     e.preventDefault();
     const input = {
       listTitle: formData.listTitle,
@@ -30,10 +30,11 @@ const Home = (props: any) => {
     };
     setStateLists([...stateLists, input]);
     try {
-      await createList.mutateAsync(input);
+      createList.mutate(input);
+    } finally {
       setFormData(initialValues);
       setModalOpen(false);
-    } catch {}
+    }
   };
 
   const handleFormChange = (e: any) => {

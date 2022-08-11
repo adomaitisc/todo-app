@@ -5,9 +5,9 @@ import { prisma } from "../utils/prisma";
 
 export const appRouter = trpc
   .router()
-  // CREATE SINGLE LIST
   .mutation("create-list", {
     input: z.object({
+      id: z.string(),
       listTitle: z.string(),
       listDescription: z.string(),
       listCompletion: z.number(),
@@ -23,7 +23,6 @@ export const appRouter = trpc
       };
     },
   })
-  // GET ALL LISTS
   .query("get-lists", {
     async resolve() {
       const lists = await prisma.list.findMany();
@@ -32,21 +31,6 @@ export const appRouter = trpc
       };
     },
   })
-  // GET SINGLE LIST
-  .query("get-list-by-id", {
-    input: z.object({
-      id: z.string(),
-    }),
-    async resolve({ input }) {
-      const listFromId = await prisma.list.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-      return listFromId;
-    },
-  })
-  // DELETE SINGLE LIST
   .mutation("delete-list-by-id", {
     input: z.object({
       id: z.string(),
@@ -62,7 +46,6 @@ export const appRouter = trpc
       };
     },
   })
-  // CREATE MANY TASKS
   .mutation("create-many-tasks", {
     input: z
       .object({
@@ -73,16 +56,15 @@ export const appRouter = trpc
       })
       .array(),
     async resolve({ input }) {
-      const created = await prisma.task.createMany({
+      await prisma.task.createMany({
         data: [...input],
         skipDuplicates: true,
       });
       return {
-        message: `${created} tasks were created under the listId ${input[0].listId}`,
+        message: `tasks were created under the listId ${input[0].listId}`,
       };
     },
   })
-  // GET MANY TASKS
   .query("get-tasks-from-id", {
     input: z.object({
       listId: z.string(),
@@ -98,7 +80,6 @@ export const appRouter = trpc
       };
     },
   })
-  // UPDATE MANY TASKS
   .mutation("update-tasks", {
     input: z
       .object({
@@ -124,7 +105,6 @@ export const appRouter = trpc
       };
     },
   })
-  // DELETE MANY TASKS
   .mutation("delete-tasks-from-id", {
     input: z.object({
       listId: z.string(),
@@ -140,40 +120,6 @@ export const appRouter = trpc
       };
     },
   })
-  // UPDATE MANY COMPLETION
-  .mutation("set-lists-completion", {
-    async resolve() {
-      const lists = await prisma.list.findMany();
-      lists.forEach(async (list) => {
-        const tasksFromList = await prisma.task.findMany({
-          where: {
-            listId: list.id,
-          },
-        });
-        const size = tasksFromList.length;
-        const completed = tasksFromList.filter((obj) => {
-          if (obj.isCompleted) {
-            return obj;
-          }
-        }).length;
-        if (size > 0) {
-          const completion = (completed / size) * 100;
-          await prisma.list.update({
-            data: {
-              listCompletion: completion,
-            },
-            where: {
-              id: list.id,
-            },
-          });
-        }
-      });
-      return {
-        success: true,
-      };
-    },
-  })
-  // UPDATE SINGLE COMPLETION
   .mutation("set-list-completion-by-id", {
     input: z.object({
       id: z.string(),

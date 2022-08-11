@@ -19,19 +19,21 @@ const Home = (props: any) => {
 
   useEffect(() => {
     setStateLists(props.lists);
+    utils.invalidateQueries(["get-lists"]);
   }, []);
 
-  const handleFormSubmit = (e: any) => {
+  const handleFormSubmit = async (e: any) => {
     e.preventDefault();
     const input = {
+      id: stateLists.length.toString(),
       listTitle: formData.listTitle,
       listDescription: formData.listDescription,
       listCompletion: 0,
     };
-    setStateLists([...stateLists, input]);
     try {
-      createList.mutate(input);
+      await createList.mutateAsync(input);
     } finally {
+      setStateLists([...stateLists, input]);
       setFormData(initialValues);
       setModalOpen(false);
     }

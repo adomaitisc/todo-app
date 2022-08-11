@@ -10,21 +10,14 @@ const List = (props: any) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [formTaskTitle, setFormTaskTitle] = useState("");
   const [stateTasks, setStateTasks] = useState<any>([]);
+  const [isChanged, setIsChanged] = useState(false);
 
   const utils = trpc.useContext();
 
   const currentList = props.list;
   const queryTasks = props.tasks;
-  const dbTasks = trpc.useQuery([
-    "get-tasks-from-id",
-    { listId: currentList.id },
-  ]);
 
-  const createTasks = trpc.useMutation(["create-many-tasks"], {
-    async onSuccess() {
-      await utils.invalidateQueries(["get-tasks-from-id"]);
-    },
-  });
+  const createTasks = trpc.useMutation(["create-many-tasks"]);
 
   const updateCompletion = trpc.useMutation(["set-list-completion-by-id"]);
   const updateTasks = trpc.useMutation(["update-tasks"]);
@@ -36,56 +29,42 @@ const List = (props: any) => {
   });
   const deleteTasks = trpc.useMutation(["delete-tasks-from-id"]);
 
-  // POPULATE STATE WITH QUERY
   useEffect(() => {
     const sortedData = queryTasks.sort(
-      (a: { id: string }, b: { id: string }) => parseInt(a.id) - parseInt(b.id)
+      (a: { id: string }, b: { id: string }) =>
+        parseInt(a.id.split("-")[0]) - parseInt(b.id.split("-")[0])
     );
     setStateTasks(sortedData);
   }, []);
 
-  // INTERVAL FUNCTION TO SAVE TO BD
-  useEffect(() => {
-    const savingFunction = setInterval(() => {
-      createTasks.mutate(stateTasks);
-    }, 300000);
-    return () => {
-      clearInterval(savingFunction);
-    };
-  }, []);
-
-  // UPDATE LIST COMPLETION AND CREATE UNSAVED TASKS
-  const handleGoBack = () => {
+  const handleGoBack = async () => {
     try {
-      updateCompletion.mutateAsync({ id: currentList.id });
-      updateTasks.mutateAsync(stateTasks);
+      await updateCompletion.mutateAsync({ id: currentList?.id });
     } finally {
       router.push("/");
     }
   };
 
-  // DELETE LIST AND ALL ITS TASKS
-  const handleListDelete = () => {
+  const handleListDelete = async () => {
     try {
-      deleteList.mutate({ id: currentList.id });
-      deleteTasks.mutate({ listId: currentList.id });
+      await deleteList.mutateAsync({ id: currentList.id });
+      await deleteTasks.mutateAsync({ listId: currentList.id });
     } finally {
       router.push("/");
     }
   };
 
-  // ADD TASK TO STATE
   const handleNewTask = (e: any) => {
     if (!formTaskTitle) return;
     const input = {
-      listId: currentList.id,
-      id: stateTasks.length.toString(),
+      listId: currentList?.id,
+      id: stateTasks.length.toString() + "-" + currentList?.id,
       taskTitle: formTaskTitle,
       isCompleted: false,
     };
-    console.log(input);
     setStateTasks([...stateTasks, input]);
     setFormTaskTitle("");
+    setIsChanged(true);
   };
 
   const handleFormChange = (e: any) => {
@@ -94,7 +73,7 @@ const List = (props: any) => {
   };
 
   const handleCheckbox = (e: any) => {
-    const id = e.target.name;
+    const id = e.target.name.split("-")[0];
     const checked = e.target.checked;
     // SHALLOW COPY OF TASKS
     const tasks = [...stateTasks];
@@ -106,12 +85,17 @@ const List = (props: any) => {
     tasks[id] = task;
     // SETTING STATE WITH NEW COPY
     setStateTasks(tasks);
+    setIsChanged(true);
   };
 
   const handleSaveChanges = () => {
     try {
       createTasks.mutate(stateTasks);
-    } catch {}
+      updateTasks.mutate(stateTasks);
+    } finally {
+      utils.invalidateQueries(["get-tasks-from-id"]);
+      setIsChanged(false);
+    }
   };
 
   return (
@@ -159,14 +143,14 @@ const List = (props: any) => {
           >
             Adicionar
           </button>
-          {queryTasks.length !== dbTasks.data?.tasks.length ? (
+          {isChanged && (
             <button
               onClick={handleSaveChanges}
               className="pr-4 text-gray-500 text-sm font-medium hover:text-gray-900 whitespace-nowrap"
             >
               Salvar Alterações
             </button>
-          ) : null}
+          )}
         </div>
 
         <div className="mt-2 mb-4 border-t border-gray-200 w-full"></div>

@@ -55,22 +55,23 @@ const List = (props: any) => {
   }, []);
 
   // UPDATE LIST COMPLETION AND CREATE UNSAVED TASKS
-  const handleGoBack = () => {
+  const handleGoBack = async () => {
     try {
-      updateCompletion.mutate({ id: currentList.id });
-      createTasks.mutate(stateTasks);
-      updateTasks.mutate(stateTasks);
-    } catch {}
-    router.push("/");
+      await updateCompletion.mutateAsync({ id: currentList.id });
+      await updateTasks.mutateAsync(stateTasks);
+    } finally {
+      router.push("/");
+    }
   };
 
   // DELETE LIST AND ALL ITS TASKS
-  const handleListDelete = () => {
+  const handleListDelete = async () => {
     try {
-      deleteList.mutate({ id: currentList.id });
-      deleteTasks.mutate({ listId: currentList.id });
-    } catch {}
-    router.push("/");
+      await deleteList.mutateAsync({ id: currentList.id });
+      await deleteTasks.mutateAsync({ listId: currentList.id });
+    } finally {
+      router.push("/");
+    }
   };
 
   // ADD TASK TO STATE
@@ -107,9 +108,9 @@ const List = (props: any) => {
     setStateTasks(tasks);
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     try {
-      createTasks.mutate(stateTasks);
+      await createTasks.mutateAsync(stateTasks);
     } catch {}
   };
 

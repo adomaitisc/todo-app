@@ -59,7 +59,7 @@ const Home = (props: any) => {
         <div className="mt-8"></div>
         <h1 className="text-gray-800 text-5xl font-medium">Bem Vindo!</h1>
         <div className="mt-4"></div>
-        <p className="text-gray-400 font-light text-xl">
+        <p className="text-gray-500 font-light text-xl">
           Este é um app simples para organizar deveres e acompanhar seu
           progresso.
         </p>
@@ -68,20 +68,29 @@ const Home = (props: any) => {
           {/* Rendering Lists */}
           {stateLists.map(
             (
-              item: { id: any; listTitle: string; listCompletion: number },
+              item: {
+                id: any;
+                listTitle: string;
+                listDescription: string;
+                listCompletion: number;
+              },
               i: number
             ) => {
               return (
                 <Link key={i} href={`list/${item.id}`}>
-                  <a className="md:w-64 h-32 sm:w-full w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20">
-                    <div className="w-full flex flex-row items-center justify-between">
-                      <div className="flex flex-between">
-                        <h1 className="text-lg text-gray-800">
+                  <a className="md:w-72 h-36 sm:w-full w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20">
+                    <div className="flex flex-col w-full">
+                      <div className="flex flex-row items center justify-between">
+                        <h1 className="text-lg text-gray-800 text-ellipsis whitespace-nowrap overflow-hidden pr-4">
                           {item.listTitle}
                         </h1>
+                        <h1 className="text-lg text-gray-800 font-bold">
+                          {item.listCompletion}%
+                        </h1>
                       </div>
-                      <p className="text-xl text-gray-700 font-bold">
-                        {item.listCompletion}%
+                      <div className="mt-1"></div>
+                      <p className="text-xs font-light text-gray-500 text-ellipsis whitespace-nowrap overflow-hidden">
+                        {item.listDescription}
                       </p>
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-1">

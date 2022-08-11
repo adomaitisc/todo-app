@@ -123,7 +123,7 @@ const List = (props: any) => {
           {currentList?.listTitle}
         </h1>
         <div className="mt-4"></div>
-        <p className="text-gray-400 font-light text-xl">
+        <p className="text-gray-500 font-light text-xl">
           {currentList?.listDescription}
         </p>
         <div className="mt-8"></div>

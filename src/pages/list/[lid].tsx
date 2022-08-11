@@ -46,10 +46,10 @@ const List = (props: any) => {
 
   const handleListDelete = async () => {
     try {
-      await deleteList.mutateAsync({ id: currentList.id });
+      await deleteTasks.mutateAsync({ listId: currentList.id });
     } catch {}
     try {
-      await deleteTasks.mutateAsync({ listId: currentList.id });
+      await deleteList.mutateAsync({ id: currentList.id });
     } catch {}
     router.push("/");
   };

@@ -1,11 +1,12 @@
 import Loading from "@/components/Loading";
 import { trpc } from "@/utils/trpc";
+import { GetServerSideProps } from "next";
+import { prisma } from "@/server/utils/prisma";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const List = () => {
+const List = (props: any) => {
   const router = useRouter();
-  const { lid } = router.query;
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [formTaskTitle, setFormTaskTitle] = useState("");
@@ -13,15 +14,8 @@ const List = () => {
 
   const utils = trpc.useContext();
 
-  const queryList = trpc.useQuery(["get-list-by-id", { id: lid!.toString() }]);
-  const currentList = queryList.data!;
-
-  const queryTasks = trpc.useQuery([
-    "get-tasks-from-id",
-    { listId: lid!.toString() },
-  ]);
-
-  const updateCompletion = trpc.useMutation(["set-list-completion-by-id"]);
+  const currentList = props.list;
+  const queryTasks = props.tasks;
 
   const createTasks = trpc.useMutation(["create-many-tasks"], {
     async onSuccess() {
@@ -29,6 +23,7 @@ const List = () => {
     },
   });
 
+  const updateCompletion = trpc.useMutation(["set-list-completion-by-id"]);
   const updateTasks = trpc.useMutation(["update-tasks"]);
 
   const deleteList = trpc.useMutation(["delete-list-by-id"], {
@@ -40,26 +35,16 @@ const List = () => {
 
   // POPULATE STATE WITH QUERY
   useEffect(() => {
-    while (!queryTasks.data) {
-      console.log("waiting data");
-    }
-    if (queryTasks.data?.tasks) {
-      const sortedData = queryTasks.data.tasks.sort(
-        (a, b) => parseInt(a.id) - parseInt(b.id)
-      );
-      setStateTasks(sortedData);
-    }
-  }, []);
-
-  useEffect(() => {
-    utils.invalidateQueries(["get-tasks-from-id"]);
+    const sortedData = queryTasks.sort(
+      (a: { id: string }, b: { id: string }) => parseInt(a.id) - parseInt(b.id)
+    );
+    setStateTasks(sortedData);
   }, []);
 
   // INTERVAL FUNCTION TO SAVE TO BD
   useEffect(() => {
     const savingFunction = setInterval(() => {
       createTasks.mutate(stateTasks);
-      router.reload();
     }, 300000);
     return () => {
       clearInterval(savingFunction);
@@ -69,7 +54,7 @@ const List = () => {
   // UPDATE LIST COMPLETION AND CREATE UNSAVED TASKS
   const handleGoBack = () => {
     try {
-      updateCompletion.mutate({ id: lid!.toString() });
+      updateCompletion.mutate({ id: currentList.id });
       createTasks.mutate(stateTasks);
       updateTasks.mutate(stateTasks);
     } catch {}
@@ -79,8 +64,8 @@ const List = () => {
   // DELETE LIST AND ALL ITS TASKS
   const handleListDelete = () => {
     try {
-      deleteList.mutate({ id: lid!.toString() });
-      deleteTasks.mutate({ listId: lid!.toString() });
+      deleteList.mutate({ id: currentList.id });
+      deleteTasks.mutate({ listId: currentList.id });
     } catch {}
     router.push("/");
   };
@@ -89,7 +74,7 @@ const List = () => {
   const handleNewTask = async (e: any) => {
     if (!formTaskTitle) return;
     const input = {
-      listId: lid!.toString(),
+      listId: currentList.id,
       id: stateTasks.length.toString(),
       taskTitle: formTaskTitle,
       isCompleted: false,
@@ -97,10 +82,6 @@ const List = () => {
     console.log(input);
     setStateTasks([...stateTasks, input]);
     setFormTaskTitle("");
-  };
-
-  const handleSave = async (e: any) => {
-    createTasks.mutate(stateTasks);
   };
 
   const handleFormChange = (e: any) => {
@@ -123,7 +104,7 @@ const List = () => {
     setStateTasks(tasks);
   };
 
-  if (!queryList.data || !queryTasks) {
+  if (!currentList || !queryTasks) {
     return <Loading page="list" />;
   }
   return (
@@ -235,4 +216,22 @@ const List = () => {
     </div>
   );
 };
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const lid = context.query.lid;
+  const listId = lid?.toString();
+  const listFromDb = await prisma.list.findUnique({
+    where: {
+      id: listId,
+    },
+  });
+  const tasksFromDb = await prisma.task.findMany({
+    where: {
+      listId: listId,
+    },
+  });
+
+  return { props: { list: listFromDb, tasks: tasksFromDb } };
+};
+
 export default List;

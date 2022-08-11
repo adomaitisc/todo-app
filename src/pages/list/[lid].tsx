@@ -1,4 +1,3 @@
-import Loading from "@/components/Loading";
 import { trpc } from "@/utils/trpc";
 import { GetServerSideProps } from "next";
 import { prisma } from "@/server/utils/prisma";
@@ -104,9 +103,6 @@ const List = (props: any) => {
     setStateTasks(tasks);
   };
 
-  if (!currentList || !queryTasks) {
-    return <Loading page="list" />;
-  }
   return (
     <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
       {/* Actual content */}

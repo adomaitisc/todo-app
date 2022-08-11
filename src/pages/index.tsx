@@ -3,40 +3,22 @@ import { useEffect, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { prisma } from "@/server/utils/prisma";
 import Link from "next/link";
-import Loading from "@/components/Loading";
 
 // pscale connect list-of-tasks main
 // npm run dev
 // npx prisma studio
 
-type ListType = {
-  listTitle: string;
-  listDescription: string;
-  listCompletion: number;
-  id: string;
-};
-
-const Home = () => {
+const Home = (props: any) => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [stateLists, setStateLists] = useState<any>([]);
   const initialValues = { listTitle: "", listDescription: "" };
   const [formData, setFormData] = useState(initialValues);
 
   const utils = trpc.useContext();
-  const setCompletion = trpc.useMutation(["set-lists-completion"], {
-    async onSuccess() {
-      await utils.invalidateQueries(["get-lists"]);
-    },
-  });
-  const queryList = trpc.useQuery(["get-lists"]);
-  const createList = trpc.useMutation(["create-list"], {
-    async onSuccess() {
-      await utils.invalidateQueries(["get-lists"]);
-    },
-  });
+  const createList = trpc.useMutation(["create-list"]);
 
   useEffect(() => {
-    setCompletion.mutate();
-    utils.invalidateQueries(["get-lists"]);
+    setStateLists(props.lists);
   }, []);
 
   const handleFormSubmit = async (e: any) => {
@@ -46,6 +28,7 @@ const Home = () => {
       listDescription: formData.listDescription,
       listCompletion: 0,
     };
+    setStateLists([...stateLists, input]);
     try {
       await createList.mutateAsync(input);
       setFormData(initialValues);
@@ -57,10 +40,6 @@ const Home = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  if (!queryList.data) {
-    return <Loading page="home" />;
-  }
 
   return (
     <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
@@ -85,30 +64,35 @@ const Home = () => {
         <div className="mt-12"></div>
         <div className="flex flex-row flex-wrap sm:w-full w-full overflow-y-auto gap-4 items-start justify-start">
           {/* Rendering Lists */}
-          {queryList.data?.lists.map((item, i) => {
-            return (
-              <Link key={i} href={`list/${item.id}`}>
-                <a className="md:w-64 h-32 sm:w-full w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20">
-                  <div className="w-full flex flex-row items-center justify-between">
-                    <div className="flex flex-between">
-                      <h1 className="text-lg text-gray-800">
-                        {item.listTitle}
-                      </h1>
+          {stateLists.map(
+            (
+              item: { id: any; listTitle: string; listCompletion: number },
+              i: number
+            ) => {
+              return (
+                <Link key={i} href={`list/${item.id}`}>
+                  <a className="md:w-64 h-32 sm:w-full w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20">
+                    <div className="w-full flex flex-row items-center justify-between">
+                      <div className="flex flex-between">
+                        <h1 className="text-lg text-gray-800">
+                          {item.listTitle}
+                        </h1>
+                      </div>
+                      <p className="text-xl text-gray-700 font-bold">
+                        {item.listCompletion}%
+                      </p>
                     </div>
-                    <p className="text-xl text-gray-700 font-bold">
-                      {item.listCompletion}%
-                    </p>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-1">
-                    <div
-                      className="bg-blue-600 h-1 rounded-full"
-                      style={{ width: `${item.listCompletion}%` }}
-                    ></div>
-                  </div>
-                </a>
-              </Link>
-            );
-          })}
+                    <div className="w-full bg-gray-700 rounded-full h-1">
+                      <div
+                        className="bg-blue-600 h-1 rounded-full"
+                        style={{ width: `${item.listCompletion}%` }}
+                      ></div>
+                    </div>
+                  </a>
+                </Link>
+              );
+            }
+          )}
         </div>
       </div>
       {/* Modal to create new Lists */}
@@ -169,7 +153,6 @@ const Home = () => {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const listsFromDb = await prisma.list.findMany();
-
   return { props: { lists: listsFromDb } };
 };
 

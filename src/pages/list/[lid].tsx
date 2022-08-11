@@ -142,7 +142,7 @@ const List = (props: any) => {
         {/* Create Task */}
         <div className="flex flex-row flex-wrap items-center gap-4 justify-start">
           <input
-            className="bg-gray-100 border border-gray-200 text-gray-900 placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+            className="bg-gray-100 border border-gray-200 text-gray-900 placeholder-gray-400 text-sm sm:text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
             type="text"
             name="taskTitle"
             placeholder="ex: reformular ui"
@@ -226,7 +226,7 @@ const List = (props: any) => {
         </div>
       </div>
       {isLoading && (
-        <div className="absolute right-0 bottom-0 mb-16 mr-28 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
+        <div className="absolute right-0 bottom-0 mb-8 mr-12 md:mb-16 md:mr-28 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
           <Triangle
             height="30"
             width="30"

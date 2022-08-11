@@ -136,7 +136,7 @@ const Home = (props: any) => {
               Título:
             </label>
             <input
-              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 text-sm sm:text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               type="text"
               name="listTitle"
               placeholder="ex: todo-app"
@@ -151,7 +151,7 @@ const Home = (props: any) => {
               Descrição:
             </label>
             <input
-              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 text-sm sm:text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               type="text"
               name="listDescription"
               placeholder="ex: site para organizar tarefas"

@@ -88,10 +88,10 @@ const List = (props: any) => {
     setIsChanged(true);
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     try {
-      createTasks.mutate(stateTasks);
-      updateTasks.mutate(stateTasks);
+      await createTasks.mutateAsync(stateTasks);
+      await updateTasks.mutateAsync(stateTasks);
     } finally {
       utils.invalidateQueries(["get-tasks-from-id"]);
       setIsChanged(false);

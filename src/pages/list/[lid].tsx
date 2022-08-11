@@ -3,10 +3,12 @@ import { GetServerSideProps } from "next";
 import { prisma } from "@/server/utils/prisma";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { Grid, Triangle } from "react-loader-spinner";
 
 const List = (props: any) => {
   const router = useRouter();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [formTaskTitle, setFormTaskTitle] = useState("");
   const [stateTasks, setStateTasks] = useState<any>([]);
@@ -38,13 +40,18 @@ const List = (props: any) => {
   }, []);
 
   const handleGoBack = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       await updateCompletion.mutateAsync({ id: currentList?.id });
     } catch {}
     router.push("/");
+    setIsLoading(false);
   };
 
   const handleListDelete = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       await deleteTasks.mutateAsync({ listId: currentList.id });
     } catch {}
@@ -52,9 +59,11 @@ const List = (props: any) => {
       await deleteList.mutateAsync({ id: currentList.id });
     } catch {}
     router.push("/");
+    setIsLoading(false);
   };
 
   const handleNewTask = (e: any) => {
+    if (isLoading) return;
     if (!formTaskTitle) return;
     const input = {
       listId: currentList?.id,
@@ -89,6 +98,8 @@ const List = (props: any) => {
   };
 
   const handleSaveChanges = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       await createTasks.mutateAsync(stateTasks);
     } catch {}
@@ -97,6 +108,7 @@ const List = (props: any) => {
     } catch {}
     utils.invalidateQueries(["get-tasks-from-id"]);
     setIsChanged(false);
+    setIsLoading(false);
   };
 
   return (
@@ -213,6 +225,18 @@ const List = (props: any) => {
           </div>
         </div>
       </div>
+      {isLoading && (
+        <div className="absolute right-0 bottom-0 mb-16 mr-28 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
+          <Triangle
+            height="30"
+            width="30"
+            color="#ffffff"
+            ariaLabel="triangle-loading"
+            wrapperStyle={{}}
+            visible={true}
+          />
+        </div>
+      )}
     </div>
   );
 };

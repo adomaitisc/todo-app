@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { prisma } from "@/server/utils/prisma";
 import Link from "next/link";
+import { Triangle } from "react-loader-spinner";
 
 // pscale connect list-of-tasks main
 // npm run dev
 // npx prisma studio
 
 const Home = (props: any) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [stateLists, setStateLists] = useState<any>([]);
   const initialValues = { listTitle: "", listDescription: "" };
@@ -23,6 +25,8 @@ const Home = (props: any) => {
   }, []);
 
   const handleFormSubmit = async (e: any) => {
+    if (isLoading) return;
+    setIsLoading(true);
     e.preventDefault();
     const input = {
       id: stateLists.length.toString(),
@@ -36,6 +40,7 @@ const Home = (props: any) => {
     setStateLists([...stateLists, input]);
     setFormData(initialValues);
     setModalOpen(false);
+    setIsLoading(false);
   };
 
   const handleFormChange = (e: any) => {
@@ -78,7 +83,10 @@ const Home = (props: any) => {
             ) => {
               return (
                 <Link key={i} href={`list/${item.id}`}>
-                  <a className="md:w-72 h-36 sm:w-full w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20">
+                  <a
+                    onClick={() => setIsLoading(true)}
+                    className="md:w-72 h-36 sm:w-full w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20"
+                  >
                     <div className="flex flex-col w-full">
                       <div className="flex flex-row items center justify-between">
                         <h1 className="text-lg text-gray-800 text-ellipsis whitespace-nowrap overflow-hidden pr-4">
@@ -158,6 +166,18 @@ const Home = (props: any) => {
           </button>
         </form>
       </div>
+      {isLoading && (
+        <div className="absolute right-0 bottom-0 mb-16 mr-28 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
+          <Triangle
+            height="30"
+            width="30"
+            color="#ffffff"
+            ariaLabel="triangle-loading"
+            wrapperStyle={{}}
+            visible={true}
+          />
+        </div>
+      )}
     </div>
   );
 };

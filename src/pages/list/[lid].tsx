@@ -40,18 +40,18 @@ const List = (props: any) => {
   const handleGoBack = async () => {
     try {
       await updateCompletion.mutateAsync({ id: currentList?.id });
-    } finally {
-      router.push("/");
-    }
+    } catch {}
+    router.push("/");
   };
 
   const handleListDelete = async () => {
     try {
       await deleteList.mutateAsync({ id: currentList.id });
+    } catch {}
+    try {
       await deleteTasks.mutateAsync({ listId: currentList.id });
-    } finally {
-      router.push("/");
-    }
+    } catch {}
+    router.push("/");
   };
 
   const handleNewTask = (e: any) => {
@@ -91,11 +91,12 @@ const List = (props: any) => {
   const handleSaveChanges = async () => {
     try {
       await createTasks.mutateAsync(stateTasks);
+    } catch {}
+    try {
       await updateTasks.mutateAsync(stateTasks);
-    } finally {
-      utils.invalidateQueries(["get-tasks-from-id"]);
-      setIsChanged(false);
-    }
+    } catch {}
+    utils.invalidateQueries(["get-tasks-from-id"]);
+    setIsChanged(false);
   };
 
   return (

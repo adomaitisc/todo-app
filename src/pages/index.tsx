@@ -32,11 +32,10 @@ const Home = (props: any) => {
     };
     try {
       await createList.mutateAsync(input);
-    } finally {
-      setStateLists([...stateLists, input]);
-      setFormData(initialValues);
-      setModalOpen(false);
-    }
+    } catch {}
+    setStateLists([...stateLists, input]);
+    setFormData(initialValues);
+    setModalOpen(false);
   };
 
   const handleFormChange = (e: any) => {

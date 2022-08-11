@@ -123,35 +123,17 @@ export const appRouter = trpc
   .mutation("set-list-completion-by-id", {
     input: z.object({
       id: z.string(),
+      completion: z.number(),
     }),
     async resolve({ input }) {
-      const list = await prisma.list.findUnique({
+      const list = await prisma.list.update({
         where: {
           id: input.id,
         },
-      });
-      const tasks = await prisma.task.findMany({
-        where: {
-          listId: input.id,
+        data: {
+          listCompletion: input.completion,
         },
       });
-      const size = tasks.length;
-      const completed = tasks.filter((obj) => {
-        if (obj.isCompleted) {
-          return obj;
-        }
-      }).length;
-      if (size > 0) {
-        const completion = Math.ceil((completed / size) * 100);
-        await prisma.list.update({
-          data: {
-            listCompletion: completion,
-          },
-          where: {
-            id: input.id,
-          },
-        });
-      }
       return {
         success: true,
       };

@@ -42,9 +42,6 @@ const List = (props: any) => {
   const handleGoBack = async () => {
     if (isLoading) return;
     setIsLoading(true);
-    try {
-      await updateCompletion.mutateAsync({ id: currentList?.id });
-    } catch {}
     router.push("/");
     setIsLoading(false);
   };
@@ -105,6 +102,23 @@ const List = (props: any) => {
     } catch {}
     try {
       await updateTasks.mutateAsync(stateTasks);
+    } catch {}
+    try {
+      const size = stateTasks.length;
+      if (size > 0) {
+        const completed = stateTasks.filter(
+          (item: { isCompleted: boolean }) => {
+            if (item.isCompleted) {
+              return item;
+            }
+          }
+        ).length;
+        const completion = Math.ceil((completed / size) * 100);
+        await updateCompletion.mutateAsync({
+          id: currentList?.id,
+          completion: completion,
+        });
+      }
     } catch {}
     utils.invalidateQueries(["get-tasks-from-id"]);
     setIsChanged(false);

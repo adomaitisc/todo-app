@@ -112,20 +112,20 @@ const List = (props: any) => {
   };
 
   return (
-    <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
+    <div className="w-screen h-screen md:py-12 md:px-24 p-0 bg-gray-200">
       {/* Actual content */}
-      <div className="w-full h-full p-12 bg-gray-100 shadow-lg md:rounded-3xl sm:rounded-none flex flex-col items-start justify-start">
+      <div className="w-full h-full md:p-12 p-8 bg-gray-100 shadow-lg md:rounded-3xl rounded-none flex flex-col items-start justify-start">
         <div className="w-full flex flex-row justify-between">
           <button
             onClick={handleGoBack}
-            className="py-2 px-4 text-gray-400 text-sm font-medium hover:text-gray-900"
+            className="py-2 px-4 text-gray-400 md:text-sm text-base font-medium hover:text-gray-900"
           >
             Início
           </button>
 
           <button
             onClick={() => setModalOpen(true)}
-            className="py-2 px-4 text-red-700 text-sm font-medium hover:text-gray-900"
+            className="py-2 px-4 text-red-700 md:text-sm text-base font-medium hover:text-gray-900"
           >
             Deletar Lista
           </button>
@@ -142,7 +142,7 @@ const List = (props: any) => {
         {/* Create Task */}
         <div className="flex flex-row flex-wrap items-center gap-4 justify-start">
           <input
-            className="bg-gray-100 border border-gray-200 text-gray-900 placeholder-gray-400 text-sm sm:text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+            className="bg-gray-100 border border-gray-200 text-gray-900 placeholder-gray-400 md:text-sm text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
             type="text"
             name="taskTitle"
             placeholder="ex: reformular ui"
@@ -152,14 +152,14 @@ const List = (props: any) => {
           />
           <button
             onClick={handleNewTask}
-            className="pr-4 text-blue-700 text-sm font-medium hover:text-gray-900 whitespace-nowrap"
+            className="pr-4 text-blue-700 md:text-sm text-base font-medium hover:text-gray-900 whitespace-nowrap"
           >
             Adicionar
           </button>
           {isChanged && (
             <button
               onClick={handleSaveChanges}
-              className="pr-4 text-gray-500 text-sm font-medium hover:text-gray-900 whitespace-nowrap"
+              className="pr-4 text-gray-500 md:text-sm text-base font-medium hover:text-gray-900 whitespace-nowrap"
             >
               Salvar Alterações
             </button>
@@ -177,16 +177,16 @@ const List = (props: any) => {
               return (
                 <div
                   key={i}
-                  className="flex flex-row gap-2 items-center justify-center"
+                  className="flex flex-row md:gap-2 gap-4 items-center justify-center"
                 >
                   <input
                     type="checkbox"
                     name={item.id}
                     checked={item.isCompleted ? true : false}
                     onChange={(e) => handleCheckbox(e)}
-                    className="bg-gray-100 border-gray-200 hover:bg-blue-300/30 cursor-pointer w-6 h-6 border checked:bg-blue-500 checked:hover:bg-blue-400 focus:outline-none rounded-md"
+                    className="bg-gray-100 border-gray-200 hover:bg-blue-300/30 cursor-pointer md:w-6 w-8 md:h-6 h-8 border checked:bg-blue-500 checked:hover:bg-blue-400 focus:outline-none rounded-md"
                   />
-                  <p className="text-gray-600 font-light text-sm">
+                  <p className="text-gray-600 font-light md:text-sm text-lg">
                     {item.taskTitle}
                   </p>
                 </div>
@@ -202,23 +202,23 @@ const List = (props: any) => {
         } overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 bottom-0 z-10 w-full flex justify-center items-center bg-gray-900/70`}
       >
         <div className="flex flex-col w-96 px-8 py-6 bg-gray-200 rounded-lg">
-          <p className="text-gray-700 font-medium">
+          <p className="text-gray-700 font-medium md:text-base text-lg">
             Tem certeza que deseja deletar essa lista?
           </p>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 md:text-sm text-base">
             (Esta ação não pode ser desfeita)
           </p>
           <div className="mt-4"></div>
           <div className="flex flex-row items-center justify-start gap-4">
             <button
               onClick={() => setModalOpen(false)}
-              className="text-sm text-gray-500 font-medium px-1 hover:text-gray-900"
+              className="md:text-sm text-base text-gray-500 font-medium px-1 hover:text-gray-900"
             >
               Cancelar
             </button>
             <button
               onClick={handleListDelete}
-              className="text-sm text-red-700 font-medium px-1 hover:text-gray-900"
+              className="md:text-sm text-base text-red-700 font-medium px-1 hover:text-gray-900"
             >
               Deletar
             </button>
@@ -226,7 +226,7 @@ const List = (props: any) => {
         </div>
       </div>
       {isLoading && (
-        <div className="absolute right-0 bottom-0 mb-8 mr-12 md:mb-16 md:mr-28 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
+        <div className="absolute right-0 bottom-0 md:mb-16 mb-4 md:mr-28 mr-4 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
           <Triangle
             height="30"
             width="30"

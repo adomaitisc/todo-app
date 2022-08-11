@@ -49,14 +49,14 @@ const Home = (props: any) => {
   };
 
   return (
-    <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
+    <div className="w-screen h-screen md:py-12 md:px-24 p-0 bg-gray-200">
       {/* Actual content */}
-      <div className="w-full h-full p-12 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
+      <div className="w-full h-full md:p-12 p-8 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
         <div className="w-full flex flex-col justify-between">
           {/* Create new List */}
           <button
             onClick={() => setModalOpen(true)}
-            className="py-2 px-4 self-end text-blue-700 text-sm font-medium hover:text-gray-900"
+            className="py-2 px-4 self-end text-blue-700 md:text-sm text-base font-medium hover:text-gray-900"
           >
             Nova Lista
           </button>
@@ -69,7 +69,7 @@ const Home = (props: any) => {
           progresso.
         </p>
         <div className="mt-12"></div>
-        <div className="flex flex-row flex-wrap sm:w-full w-full overflow-y-auto gap-4 items-start justify-start">
+        <div className="flex flex-row flex-wrap w-full overflow-y-auto gap-4 items-start justify-start">
           {/* Rendering Lists */}
           {stateLists.map(
             (
@@ -85,23 +85,23 @@ const Home = (props: any) => {
                 <Link key={i} href={`list/${item.id}`}>
                   <a
                     onClick={() => setIsLoading(true)}
-                    className="md:w-72 h-36 sm:w-full w-full p-8 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20"
+                    className="md:w-72 w-full h-36 md:p-8 p-4 bg-gray-100 border rounded-lg flex flex-col items-start justify-between duration-100 hover:bg-gray-200/20"
                   >
                     <div className="flex flex-col w-full">
                       <div className="flex flex-row items center justify-between">
-                        <h1 className="text-lg text-gray-800 text-ellipsis whitespace-nowrap overflow-hidden pr-4">
+                        <h1 className="md:text-lg text-2xl text-gray-800 text-ellipsis whitespace-nowrap overflow-hidden pr-4">
                           {item.listTitle}
                         </h1>
-                        <h1 className="text-lg text-gray-800 font-bold">
+                        <h1 className="md:text-lg text-2xl text-gray-800 font-bold">
                           {item.listCompletion}%
                         </h1>
                       </div>
                       <div className="mt-1"></div>
-                      <p className="text-xs font-light text-gray-500 text-ellipsis whitespace-nowrap overflow-hidden">
+                      <p className="md:text-xs text-lg font-light text-gray-500 text-ellipsis whitespace-nowrap overflow-hidden">
                         {item.listDescription}
                       </p>
                     </div>
-                    <div className="w-full bg-gray-700 rounded-full h-1">
+                    <div className="w-full md:mb-0 mb-4 bg-gray-700 rounded-full h-1">
                       <div
                         className="bg-blue-600 h-1 rounded-full"
                         style={{ width: `${item.listCompletion}%` }}
@@ -122,21 +122,21 @@ const Home = (props: any) => {
       >
         <form
           onSubmit={handleFormSubmit}
-          className="flex flex-col w-96 px-8 py-6 bg-gray-200 rounded-lg"
+          className="flex flex-col w-96 px-8 py-6 md:gap-0 gap-2 bg-gray-200 rounded-lg"
         >
           <button
             type="button"
             onClick={() => setModalOpen(false)}
-            className="self-end text-sm text-red-700 font-medium hover:text-gray-900"
+            className="self-end md:text-sm text-base text-red-700 font-medium hover:text-gray-900"
           >
             Cancelar
           </button>
           <div className="flex-flex-col w-full">
-            <label className="block mb-1 text-sm font-medium text-gray-600">
+            <label className="block mb-1 md:text-sm text-lg font-medium text-gray-600">
               Título:
             </label>
             <input
-              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 text-sm sm:text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 md:text-sm text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               type="text"
               name="listTitle"
               placeholder="ex: todo-app"
@@ -147,11 +147,11 @@ const Home = (props: any) => {
           </div>
           <div className="mt-4"></div>
           <div className="flex-flex-col w-full">
-            <label className="block mb-1 text-sm font-medium text-gray-600">
+            <label className="block mb-1 md:text-sm text-lg font-medium text-gray-600">
               Descrição:
             </label>
             <input
-              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 text-sm sm:text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className="bg-gray-200 border border-gray-300 text-gray-900 placeholder-gray-400 md:text-sm text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               type="text"
               name="listDescription"
               placeholder="ex: site para organizar tarefas"
@@ -161,13 +161,13 @@ const Home = (props: any) => {
             />
           </div>
           <div className="mt-4"></div>
-          <button className="self-start text-sm text-blue-700 font-medium px-1 hover:text-gray-900">
+          <button className="self-start md:text-sm text-base text-blue-700 font-medium px-1 hover:text-gray-900">
             Criar Lista
           </button>
         </form>
       </div>
       {isLoading && (
-        <div className="absolute right-0 bottom-0 mb-16 mr-28 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
+        <div className="absolute right-0 bottom-0 md:mb-16 mb-4 md:mr-28 mr-4 z-10 rounded-md w-12 h-12 bg-black flex items-center justify-center">
           <Triangle
             height="30"
             width="30"

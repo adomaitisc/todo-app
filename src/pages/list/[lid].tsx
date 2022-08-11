@@ -15,6 +15,10 @@ const List = (props: any) => {
 
   const currentList = props.list;
   const queryTasks = props.tasks;
+  const dbTasks = trpc.useQuery([
+    "get-tasks-from-id",
+    { listId: currentList.id },
+  ]);
 
   const createTasks = trpc.useMutation(["create-many-tasks"], {
     async onSuccess() {
@@ -103,6 +107,12 @@ const List = (props: any) => {
     setStateTasks(tasks);
   };
 
+  const handleSaveChanges = () => {
+    try {
+      createTasks.mutate(stateTasks);
+    } catch {}
+  };
+
   return (
     <div className="w-screen h-screen md:py-12 md:px-24 sm:p-0 bg-gray-200">
       {/* Actual content */}
@@ -148,6 +158,14 @@ const List = (props: any) => {
           >
             Adicionar
           </button>
+          {queryTasks.length !== dbTasks.data?.tasks.length ? (
+            <button
+              onClick={handleSaveChanges}
+              className="pr-4 text-gray-500 text-sm font-medium hover:text-gray-900 whitespace-nowrap"
+            >
+              Salvar Alterações
+            </button>
+          ) : null}
         </div>
 
         <div className="mt-2 mb-4 border-t border-gray-200 w-full"></div>

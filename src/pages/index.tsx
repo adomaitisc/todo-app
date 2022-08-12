@@ -51,7 +51,7 @@ const Home = (props: any) => {
   return (
     <div className="w-screen h-screen md:py-12 md:px-24 p-0 bg-gray-200">
       {/* Actual content */}
-      <div className="w-full h-full md:p-12 p-8 bg-gray-100 shadow-lg rounded-3xl flex flex-col items-start justify-start">
+      <div className="w-full h-full md:p-12 p-8 bg-gray-100 shadow-lg md:rounded-3xl flex flex-col items-start justify-start">
         <div className="w-full flex flex-col justify-between">
           {/* Create new List */}
           <button
@@ -69,7 +69,7 @@ const Home = (props: any) => {
           progresso.
         </p>
         <div className="mt-12"></div>
-        <div className="flex flex-row flex-wrap w-full overflow-y-auto gap-4 items-start justify-start">
+        <div className="flex flex-row flex-wrap md:pb-0 sm:pb-0 pb-16 w-full overflow-y-auto gap-4 items-start justify-start">
           {/* Rendering Lists */}
           {stateLists.map(
             (

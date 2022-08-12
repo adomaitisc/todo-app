@@ -179,10 +179,9 @@ const List = (props: any) => {
             </button>
           )}
         </div>
-
         <div className="mt-2 mb-4 border-t border-gray-200 w-full"></div>
         {/* Render Tasks */}
-        <div className="flex flex-col flex-wrap w-full overflow-y-auto gap-4 items-start justify-start">
+        <div className="md:flex md:flex-col mt-0 md:pb-0 sm:pb-0 pb-16 w-full overflow-y-auto space-y-4 items-start justify-start">
           {stateTasks.map(
             (
               item: { id: string; isCompleted: boolean; taskTitle: string },
@@ -191,7 +190,7 @@ const List = (props: any) => {
               return (
                 <div
                   key={i}
-                  className="flex flex-row md:gap-2 gap-4 items-center justify-center"
+                  className="flex flex-row md:gap-2 gap-4 items-center md:justify-center justify-start"
                 >
                   <input
                     type="checkbox"
